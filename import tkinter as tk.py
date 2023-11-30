@@ -1,8 +1,5 @@
 import tkinter as tk
 from tkinter import filedialog
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
-from fpdf import FPDF
 import os 
 import pandas as pd
 
@@ -10,19 +7,47 @@ import pandas as pd
 
 directory_path = filedialog.askdirectory(title="Select Directory")
 files = os.listdir(directory_path)
-csv_file = "D:\FIle Handler\Book1.csv"
-df = pd.read_csv(csv_file,header=None)
+files = sorted(files, key=lambda x: os.path.getmtime(os.path.join(directory_path, x)))
+csv_file = filedialog.askopenfile(title="Select CSV", filetypes=(("CSV Files", "*.csv"),("All files", "*.*")))
+df = pd.read_csv(csv_file)
 df.reset_index(drop=True, inplace=True)
 x = 0
-
-for file in files:
-    if (x<=len(df)):
-        print(df.iloc[x,0])
-        old_file = os.path.join(directory_path, file)
-        new_file = os.path.join(directory_path, df.iloc[x,0])
-        if not os.path.exists(new_file):
-            os.rename(old_file, new_file)
+def operation(x):
+    for file in files:
+        print(file)
+        if (x<=len(df)):
+        
+            if (len(files) == len(df.iloc[:, 0])):
+                extension = file.split('.')
+                extens = str(extension[-1])
+                old_file = os.path.join(directory_path, file)
+                new_file = os.path.join(directory_path, df.iloc[x,0])
+                new_file = new_file +"."+ extens
+                if not os.path.exists(new_file):
+                    os.rename(old_file, new_file)
+                    print("file renamed to" + df.iloc[x,0])
+    
+            else:
+                print("The number of files is different from the number of names in the CSV. Please provide a fixed CSV.")
+                getCSV()
+                operation()
         x = x+1
+
+        
+        
+    
+
+def getCSV():
+    csv_file = filedialog.askopenfile(title="Select CSV")
+
+operation(0)
+
+    
+
+
+
+        
+        
 
 
 
